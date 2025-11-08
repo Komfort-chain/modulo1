@@ -1,80 +1,82 @@
 # 🧩 Módulo 1 — API de Pessoas (Komfort Chain)
 
-O **Módulo 1** é uma API de gestão de pessoas desenvolvida como parte do projeto **Komfort Chain**, uma suíte modular voltada à automação e integração de sistemas distribuídos.  
+O **Módulo 1** é uma API de gestão de pessoas desenvolvida como parte do projeto **Komfort Chain**, uma suíte modular voltada à automação e integração de sistemas distribuídos.
 Este serviço implementa princípios de **Clean Architecture** e **SOLID**, com logs centralizados no **Graylog** e banco relacional **PostgreSQL** em container Docker.
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
-| Categoria | Tecnologia |
-|------------|-------------|
-| Linguagem  | Java 21 |
-| Framework  | Spring Boot 3.5.7 |
-| Banco de Dados | PostgreSQL 16 |
-| Observabilidade | Graylog 5.2 (via Logback GELF) |
-| Build | Maven |
-| Containerização | Docker e Docker Compose |
-| Testes | JUnit + Spring Boot Test |
-| Arquitetura | Clean Architecture + SOLID |
+| Categoria         | Tecnologia                     |
+| ----------------- | ------------------------------ |
+| Linguagem         | Java 21                        |
+| Framework         | Spring Boot 3.5.7              |
+| Banco de Dados    | PostgreSQL 16                  |
+| Observabilidade   | Graylog 5.2 (via Logback GELF) |
+| Build             | Maven                          |
+| Containerização   | Docker e Docker Compose        |
+| Testes            | JUnit + Spring Boot Test       |
+| Análise de Código | SonarQube 25.11                |
+| Arquitetura       | Clean Architecture + SOLID     |
 
 ---
 
 ## 🧱 Estrutura do Projeto
 
 ```
-
 modulo1/
 ├── docker-compose.yml
 ├── Dockerfile
 └── pessoas/
-├── pom.xml
-├── src/
-│   ├── main/
-│   │   ├── java/com/cabos/pessoas/
-│   │   │   ├── PessoasApplication.java       # Classe principal
-│   │   │   ├── domain/                      # Entidades (camada de domínio)
-│   │   │   ├── repo/                        # Repositórios (persistence)
-│   │   │   ├── service/                     # Regras de negócio (use cases)
-│   │   │   └── web/                         # Controladores REST e DTOs
-│   │   │       ├── dto/
-│   │   │       ├── handler/                 # GlobalExceptionHandler
-│   │   │       └── mapper/                  # Conversores DTO ↔ Entidade
-│   │   └── resources/
-│   │       ├── application.yml              # Configurações do Spring
-│   │       └── logback-spring.xml           # Configuração de logs (Graylog)
-│   └── test/                                # Testes automatizados
-└── target/                                  # Artefatos de build
-
+    ├── pom.xml
+    ├── src/
+    │   ├── main/
+    │   │   ├── java/com/cabos/pessoas/
+    │   │   │   ├── PessoasApplication.java       # Classe principal
+    │   │   │   ├── domain/                      # Entidades (camada de domínio)
+    │   │   │   ├── repo/                        # Repositórios (persistence)
+    │   │   │   ├── service/                     # Regras de negócio (use cases)
+    │   │   │   └── web/                         # Controladores REST e DTOs
+    │   │   │       ├── dto/
+    │   │   │       ├── handler/                 # GlobalExceptionHandler
+    │   │   │       └── mapper/                  # Conversores DTO ↔ Entidade
+    │   │   └── resources/
+    │   │       ├── application.yml              # Configurações do Spring
+    │   │       └── logback-spring.xml           # Configuração de logs (Graylog)
+    │   └── test/                                # Testes automatizados
+    └── target/                                  # Artefatos de build
 ```
 
 **Fluxo arquitetural:**
+
 ```
-
 Controller → Service → Repository → Domain
-
-````
+```
 
 ---
 
 ## 🧠 Padrões Implementados
 
-- ✅ **SOLID Principles**
-- ✅ **Clean Architecture**
-- ✅ **DTO e Mapper** (separa domínio e camada de exposição)
-- ✅ **Handler global** (captura exceções personalizadas)
-- ✅ **Logs estruturados no Graylog**
-- ✅ **Testes de integração e unidade**
+* ✅ **SOLID Principles**
+* ✅ **Clean Architecture**
+* ✅ **DTO e Mapper** (separa domínio e camada de exposição)
+* ✅ **Handler global** (captura exceções personalizadas)
+* ✅ **Logs estruturados no Graylog**
+* ✅ **Testes de integração e unidade**
+* ✅ **Análise de qualidade com SonarQube**
 
 ---
 
 ## ⚙️ Como Executar
 
 ### 1️⃣ Clonar o repositório
+
 ```bash
 git clone https://github.com/seu-usuario/komfortchain-modulo1.git
 cd komfortchain-modulo1
-````
+```
+
+---
 
 ### 2️⃣ Buildar e executar a aplicação com Docker
 
@@ -103,26 +105,29 @@ Esses comandos:
 | PostgreSQL     | `5432`  | Banco de dados da aplicação |
 | MongoDB        | `27017` | Base do Graylog             |
 | OpenSearch     | `9200`  | Engine de busca do Graylog  |
+| SonarQube      | `9000`  | Análise estática de código  |
 
 ---
 
-## 🧩 Endpoints Principais
+## 🔍 Análise de Qualidade com SonarQube
 
-| Método   | Endpoint        | Descrição                       |
-| -------- | --------------- | ------------------------------- |
-| `GET`    | `/pessoas`      | Lista pessoas ativas (paginado) |
-| `GET`    | `/pessoas/{id}` | Busca uma pessoa pelo ID        |
-| `POST`   | `/pessoas`      | Cria uma nova pessoa            |
-| `PUT`    | `/pessoas/{id}` | Atualiza uma pessoa existente   |
-| `DELETE` | `/pessoas/{id}` | Remove uma pessoa               |
+O projeto pode ser analisado via **SonarQube** para detectar problemas de código, vulnerabilidades e más práticas.
 
-### 📦 Exemplo de criação:
+### 🧠 Executar a análise manual:
 
 ```bash
-curl -X POST http://localhost:8081/pessoas \
--H "Content-Type: application/json" \
--d '{"nome": "Alan Silva", "dtNascimento": "1995-05-20", "ativo": true}'
+.\mvnw.cmd clean verify sonar:sonar '-Dsonar.projectKey=modulo1-pessoas' '-Dsonar.host.url=http://localhost:9000' '-Dsonar.token=sqa_1d521994fe82f0e423dedfb00db0c01d70c6722d' '-DskipTests'
 ```
+
+Após a execução bem-sucedida, acesse o dashboard:
+👉 [http://localhost:9000/dashboard?id=modulo1-pessoas](http://localhost:9000/dashboard?id=modulo1-pessoas)
+
+O Sonar exibirá métricas como:
+
+* 🧩 Bugs e vulnerabilidades
+* 🧼 Code Smells
+* 🧪 Cobertura de testes
+* 📊 Duplicação de código
 
 ---
 
@@ -154,32 +159,14 @@ Acesse o painel do Graylog:
 
 ---
 
-## 🧪 Testes
-
-Para executar os testes automatizados:
-
-```bash
-cd pessoas
-mvn test
-```
-
-Após a execução, consulte os relatórios:
-
-```
-pessoas/target/surefire-reports/
-```
-
----
-
 ## 🧑‍💻 Autor
 
 **Alan de Lima Silva (MagyoDev)**
-- 📧 E-mail: [magyodev@gmail.com](mailto:magyodev@gmail.com)
-- 🌐 GitHub: [https://github.com/MagyoDev](https://github.com/MagyoDev)
+- 📧 [magyodev@gmail.com](mailto:magyodev@gmail.com)
+- 🌐 [https://github.com/MagyoDev](https://github.com/MagyoDev)
 
 ---
 
 ## 🧾 Licença
 
 Este projeto está licenciado sob a [MIT License](LICENSE).
-
