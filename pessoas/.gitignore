@@ -1,0 +1,85 @@
+# =====================================
+# 🧩 PROJETO KOMFORT CHAIN - MÓDULO 1
+# Spring Boot + Maven + Docker
+# =====================================
+
+# ====== MAVEN / BUILD ======
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+mvnw
+mvnw.cmd
+
+# ====== LOGS ======
+*.log
+logs/
+*.out
+
+# ====== CONFIGURAÇÕES DE IDE ======
+### IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+### Eclipse / STS
+.classpath
+.project
+.settings/
+
+### VS Code
+.vscode/
+.history/
+*.code-workspace
+
+# ====== SISTEMA OPERACIONAL ======
+.DS_Store
+Thumbs.db
+ehthumbs.db
+*.swp
+*.swo
+
+# ====== AMBIENTE DOCKER ======
+docker-compose.override.yml
+*.pid
+*.tar
+.env
+.env.local
+.env.*.local
+
+# ====== ARQUIVOS TEMPORÁRIOS ======
+*.tmp
+*.bak
+*.old
+*.orig
+*~
+
+# ====== ZIPs / BACKUPS ======
+*.zip
+*.rar
+*.7z
+
+# ====== GERAÇÃO DE TESTES ======
+/test-output/
+/surefire-reports/
+/jacoco.exec
+/jacoco-report/
+
+# ====== DEPLOY / CONTAINERS ======
+app.jar
+*.war
+
+# ====== SISTEMAS DE BUILD ======
+/build/
+/bin/
+/dist/
+/classes/
+/generated/
+/dependency-reduced-pom.xml
+
+# ====== OUTROS ======
+/.idea_modules/
+/target-eclipse/
+/nbproject/
+/nbactions.xml
+/nb-configuration.xml
+*.properties~

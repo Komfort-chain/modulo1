@@ -1,0 +1,95 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: pessoas_db
+    environment:
+      POSTGRES_DB: pessoas
+      POSTGRES_USER: pessoas
+      POSTGRES_PASSWORD: pessoas
+    ports:
+      - "5432:5432"
+    networks:
+      - net
+
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: opensearch
+    environment:
+      discovery.type: single-node
+      plugins.security.disabled: "true"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    networks:
+      - net
+
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - net
+
+  graylog:
+    image: graylog/graylog:5.2
+    container_name: graylog
+    depends_on:
+      - mongodb
+      - opensearch
+    environment:
+      GRAYLOG_PASSWORD_SECRET: thisisalongsecret
+      GRAYLOG_ROOT_PASSWORD_SHA2: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+      GRAYLOG_HTTP_EXTERNAL_URI: http://127.0.0.1:9009/
+      GRAYLOG_MONGODB_URI: mongodb://mongodb:27017/graylog
+      GRAYLOG_ELASTICSEARCH_HOSTS: http://opensearch:9200
+    ports:
+      - "9009:9000"
+      - "12201:12201/udp"
+      - "12201:12201/tcp"
+    networks:
+      - net
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    networks:
+      - net
+
+  app:
+    build: .
+    container_name: modulo1-app
+    depends_on:
+      - db
+      - graylog
+    environment:
+      # Conexão com o PostgreSQL
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pessoas_db:5432/pessoas
+      SPRING_DATASOURCE_USERNAME: pessoas
+      SPRING_DATASOURCE_PASSWORD: pessoas
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      # Graylog
+      GRAYLOG_HOST: graylog
+      GRAYLOG_PORT: 12201
+
+      # Server
+      SERVER_PORT: 8080
+    ports:
+      - "8081:8080"
+    networks:
+      - net
+
+networks:
+  net:
+    driver: bridge
