@@ -166,7 +166,3 @@ Acesse o painel do Graylog:
 - 🌐 [https://github.com/MagyoDev](https://github.com/MagyoDev)
 
 ---
-
-## 🧾 Licença
-
-Este projeto está licenciado sob a [MIT License](LICENSE).
