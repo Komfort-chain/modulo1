@@ -24,24 +24,36 @@ O objetivo deste módulo é implementar um CRUD de Pessoa com persistência em b
 ## Estrutura do Projeto
 
 ```
-modulo1/
-├── docker-compose.yml
+pessoas/
 ├── Dockerfile
-└── pessoas/
-    ├── pom.xml
-    ├── src/
-    │   ├── main/
-    │   │   ├── java/com/cabos/pessoas/
-    │   │   │   ├── PessoasApplication.java
-    │   │   │   ├── domain/
-    │   │   │   ├── repo/
-    │   │   │   ├── service/
-    │   │   │   └── web/
-    │   │   └── resources/
-    │   │       ├── application.yml
-    │   │       └── logback-spring.xml
-    │   └── test/
-    └── target/
+├── docker-compose.yml
+├── pom.xml
+├── src/
+│   ├── main/
+│   │   ├── java/com/cabos/pessoas/
+│   │   │   ├── application/
+│   │   │   │   ├── dto/
+│   │   │   │   │   └── PessoaDTO.java
+│   │   │   │   └── service/
+│   │   │   │       └── PessoaService.java
+│   │   │   ├── domain/
+│   │   │   │   └── Pessoa.java
+│   │   │   ├── infrastructure/
+│   │   │   │   └── persistence/repository/
+│   │   │   │       └── PessoaRepository.java
+│   │   │   └── presentation/
+│   │   │       ├── controller/
+│   │   │       │   └── PessoaController.java
+│   │   │       ├── handler/
+│   │   │       │   └── GlobalExceptionHandler.java
+│   │   │       └── mapper/
+│   │   │           └── PessoaMapper.java
+│   │   └── resources/
+│   │       ├── application.yml
+│   │       └── logback-spring.xml
+│   └── test/
+│       └── java/com/cabos/pessoas/
+│           └── PessoasApplicationTests.java
 ```
 
 Fluxo arquitetural:
