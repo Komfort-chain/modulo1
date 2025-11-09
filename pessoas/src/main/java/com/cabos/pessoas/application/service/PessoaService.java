@@ -1,7 +1,8 @@
-package com.cabos.pessoas.service;
+package com.cabos.pessoas.application.service;
 
 import com.cabos.pessoas.domain.Pessoa;
-import com.cabos.pessoas.repo.PessoaRepository;
+import com.cabos.pessoas.infrastructure.persistence.repository.PessoaRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

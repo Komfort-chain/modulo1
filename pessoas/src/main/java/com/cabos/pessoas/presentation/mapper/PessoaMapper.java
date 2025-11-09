@@ -1,7 +1,7 @@
-package com.cabos.pessoas.web.mapper;
+package com.cabos.pessoas.presentation.mapper;
 
+import com.cabos.pessoas.application.dto.PessoaDTO;
 import com.cabos.pessoas.domain.Pessoa;
-import com.cabos.pessoas.web.dto.PessoaDTO;
 
 /**
  * Mapper responsável por converter entre Entity e DTO.

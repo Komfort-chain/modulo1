@@ -1,4 +1,4 @@
-package com.cabos.pessoas.web.dto;
+package com.cabos.pessoas.application.dto;
 
 import java.time.LocalDate;
 

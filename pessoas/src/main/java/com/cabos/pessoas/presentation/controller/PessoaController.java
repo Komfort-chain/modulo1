@@ -1,9 +1,10 @@
-package com.cabos.pessoas.web;
+package com.cabos.pessoas.presentation.controller;
 
+import com.cabos.pessoas.application.dto.PessoaDTO;
+import com.cabos.pessoas.application.service.PessoaService;
 import com.cabos.pessoas.domain.Pessoa;
-import com.cabos.pessoas.service.PessoaService;
-import com.cabos.pessoas.web.dto.PessoaDTO;
-import com.cabos.pessoas.web.mapper.PessoaMapper;
+import com.cabos.pessoas.presentation.mapper.PessoaMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

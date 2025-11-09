@@ -1,4 +1,4 @@
-package com.cabos.pessoas.web.handler;
+package com.cabos.pessoas.presentation.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

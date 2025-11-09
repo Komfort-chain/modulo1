@@ -1,4 +1,4 @@
-package com.cabos.pessoas.repo;
+package com.cabos.pessoas.infrastructure.persistence.repository;
 
 import com.cabos.pessoas.domain.Pessoa;
 import org.springframework.data.domain.Page;
