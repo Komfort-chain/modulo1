@@ -1,11 +1,11 @@
-# 🧩 Módulo 1 — API de Pessoas (Komfort Chain)
+# Módulo 1 — API de Pessoas (Komfort Chain)
 
-O **Módulo 1** é uma API de gestão de pessoas desenvolvida como parte do projeto **Komfort Chain**, uma suíte modular voltada à automação e integração de sistemas distribuídos.
-Este serviço implementa princípios de **Clean Architecture** e **SOLID**, com logs centralizados no **Graylog** e banco relacional **PostgreSQL** em container Docker.
+O **Módulo 1** é uma API REST de gestão de pessoas desenvolvida como parte do projeto **Komfort Chain**, uma suíte modular voltada à automação e integração de sistemas distribuídos.
+O objetivo deste módulo é implementar um CRUD de Pessoa com persistência em banco de dados, logs centralizados e arquitetura limpa.
 
 ---
 
-## 🚀 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 | Categoria         | Tecnologia                     |
 | ----------------- | ------------------------------ |
@@ -21,7 +21,7 @@ Este serviço implementa princípios de **Clean Architecture** e **SOLID**, com 
 
 ---
 
-## 🧱 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 modulo1/
@@ -32,22 +32,19 @@ modulo1/
     ├── src/
     │   ├── main/
     │   │   ├── java/com/cabos/pessoas/
-    │   │   │   ├── PessoasApplication.java       # Classe principal
-    │   │   │   ├── domain/                      # Entidades (camada de domínio)
-    │   │   │   ├── repo/                        # Repositórios (persistence)
-    │   │   │   ├── service/                     # Regras de negócio (use cases)
-    │   │   │   └── web/                         # Controladores REST e DTOs
-    │   │   │       ├── dto/
-    │   │   │       ├── handler/                 # GlobalExceptionHandler
-    │   │   │       └── mapper/                  # Conversores DTO ↔ Entidade
+    │   │   │   ├── PessoasApplication.java
+    │   │   │   ├── domain/
+    │   │   │   ├── repo/
+    │   │   │   ├── service/
+    │   │   │   └── web/
     │   │   └── resources/
-    │   │       ├── application.yml              # Configurações do Spring
-    │   │       └── logback-spring.xml           # Configuração de logs (Graylog)
-    │   └── test/                                # Testes automatizados
-    └── target/                                  # Artefatos de build
+    │   │       ├── application.yml
+    │   │       └── logback-spring.xml
+    │   └── test/
+    └── target/
 ```
 
-**Fluxo arquitetural:**
+Fluxo arquitetural:
 
 ```
 Controller → Service → Repository → Domain
@@ -55,30 +52,16 @@ Controller → Service → Repository → Domain
 
 ---
 
-## 🧠 Padrões Implementados
+## Como Executar
 
-* ✅ **SOLID Principles**
-* ✅ **Clean Architecture**
-* ✅ **DTO e Mapper** (separa domínio e camada de exposição)
-* ✅ **Handler global** (captura exceções personalizadas)
-* ✅ **Logs estruturados no Graylog**
-* ✅ **Testes de integração e unidade**
-* ✅ **Análise de qualidade com SonarQube**
-
----
-
-## ⚙️ Como Executar
-
-### 1️⃣ Clonar o repositório
+### 1. Clonar o repositório
 
 ```bash
 git clone https://github.com/seu-usuario/komfortchain-modulo1.git
 cd komfortchain-modulo1
 ```
 
----
-
-### 2️⃣ Buildar e executar a aplicação com Docker
+### 2. Buildar e executar a aplicação com Docker
 
 ```bash
 cd pessoas
@@ -90,79 +73,34 @@ docker compose up -d app
 
 Esses comandos:
 
-* Compilam e empacotam o projeto em `pessoas/target/app.jar`
-* Constroem a imagem Docker do módulo
-* Sobem o container da aplicação conectado aos serviços (Postgres, Graylog, etc.)
+* Compilam e empacotam o projeto em `pessoas/target/app.jar`;
+* Constroem a imagem Docker;
+* Sobem o container da aplicação conectado aos serviços (PostgreSQL, Graylog, etc.).
 
 ---
 
-### 3️⃣ Verificar os serviços
+## Serviços
 
-| Serviço        | Porta   | Descrição                   |
-| -------------- | ------- | --------------------------- |
-| API de Pessoas | `8081`  | Endpoints REST              |
-| Graylog        | `9009`  | Central de logs             |
-| PostgreSQL     | `5432`  | Banco de dados da aplicação |
-| MongoDB        | `27017` | Base do Graylog             |
-| OpenSearch     | `9200`  | Engine de busca do Graylog  |
-| SonarQube      | `9000`  | Análise estática de código  |
-
----
-
-## 🔍 Análise de Qualidade com SonarQube
-
-O projeto pode ser analisado via **SonarQube** para detectar problemas de código, vulnerabilidades e más práticas.
-
-### 🧠 Executar a análise manual:
-
-```bash
-.\mvnw.cmd clean verify sonar:sonar '-Dsonar.projectKey=modulo1-pessoas' '-Dsonar.host.url=http://localhost:9000' '-Dsonar.token=sqa_1d521994fe82f0e423dedfb00db0c01d70c6722d' '-DskipTests'
-```
-
-Após a execução bem-sucedida, acesse o dashboard:
-👉 [http://localhost:9000/dashboard?id=modulo1-pessoas](http://localhost:9000/dashboard?id=modulo1-pessoas)
-
-O Sonar exibirá métricas como:
-
-* 🧩 Bugs e vulnerabilidades
-* 🧼 Code Smells
-* 🧪 Cobertura de testes
-* 📊 Duplicação de código
+| Serviço        | Porta | Descrição                   |
+| -------------- | ----- | --------------------------- |
+| API de Pessoas | 8081  | Endpoints REST              |
+| Graylog        | 9009  | Central de logs             |
+| PostgreSQL     | 5432  | Banco de dados da aplicação |
+| MongoDB        | 27017 | Base do Graylog             |
+| OpenSearch     | 9200  | Engine de busca Graylog     |
+| SonarQube      | 9000  | Análise estática de código  |
 
 ---
 
-## 🪵 Logs e Observabilidade
+## Descrição do Projeto
 
-Os logs da aplicação são enviados automaticamente para o **Graylog** via **Logback GELF**, contendo informações como:
-
-| Campo       | Descrição                          |
-| ----------- | ---------------------------------- |
-| `app`       | Nome do módulo (`modulo1-pessoas`) |
-| `source`    | Container de origem                |
-| `timestamp` | Data/hora do evento                |
-| `message`   | Mensagem de log da aplicação       |
-
-Acesse o painel do Graylog:
-👉 [http://localhost:9009](http://localhost:9009)
+A API realiza operações CRUD sobre entidades de Pessoa, armazenando os dados em um banco relacional.
+Somente registros com o atributo `ativo = true` são retornados, e as respostas são paginadas (10 itens por página).
+Os logs da aplicação são enviados para o Graylog para monitoramento centralizado.
 
 ---
 
-## 🌐 Variáveis de Ambiente
+**Autor:** Alan de Lima Silva (MagyoDev)
+- **GitHub:** [https://github.com/MagyoDev](https://github.com/MagyoDev)
+- **E-mail:** [magyodev@gmail.com](mailto:magyodev@gmail.com)
 
-| Variável                     | Descrição                | Valor padrão                                |
-| ---------------------------- | ------------------------ | ------------------------------------------- |
-| `GRAYLOG_HOST`               | Host do servidor Graylog | `graylog`                                   |
-| `GRAYLOG_PORT`               | Porta UDP do Graylog     | `12201`                                     |
-| `SPRING_DATASOURCE_URL`      | URL JDBC do Postgres     | `jdbc:postgresql://pessoas_db:5432/pessoas` |
-| `SPRING_DATASOURCE_USERNAME` | Usuário do Postgres      | `pessoas`                                   |
-| `SPRING_DATASOURCE_PASSWORD` | Senha do Postgres        | `pessoas`                                   |
-
----
-
-## 🧑‍💻 Autor
-
-**Alan de Lima Silva (MagyoDev)**
-- 📧 [magyodev@gmail.com](mailto:magyodev@gmail.com)
-- 🌐 [https://github.com/MagyoDev](https://github.com/MagyoDev)
-
----
