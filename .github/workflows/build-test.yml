@@ -1,0 +1,25 @@
+name: Build & SonarQube Analysis
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Build & Test
+        run: ./pessoas/mvnw clean verify -DskipTests=false
+      - name: SonarQube Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./pessoas/mvnw sonar:sonar `
+          -Dsonar.projectKey=modulo1-pessoas `
+          -Dsonar.host.url=http://localhost:9000 `
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
