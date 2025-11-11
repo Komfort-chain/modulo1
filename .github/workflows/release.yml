@@ -25,7 +25,7 @@ jobs:
           java-version: 21
 
       - name: Build artifact with Maven
-        working-directory: api-pessoas
+        working-directory: pessoas
         run: |
           chmod +x mvnw
           ./mvnw clean package -DskipTests=true
@@ -51,6 +51,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            api-pessoas/target/api-pessoas-*.jar
+            pessoas/target/api-pessoas-*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

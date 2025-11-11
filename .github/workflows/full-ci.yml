@@ -30,24 +30,20 @@ jobs:
           java-version: 21
           distribution: temurin
 
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Cache Maven packages
+      - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
+      - name: Grant execute permission to Maven Wrapper
+        run: chmod +x pessoas/mvnw
+
       - name: Build and test (API Pessoas)
         working-directory: pessoas
         run: |
-          mvn -B clean verify \
+          ./mvnw -B clean verify \
             -Dspring.profiles.active=test \
             -DskipTests=false
 
@@ -56,7 +52,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:5.3.0.6276:sonar \
+          ./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:5.3.0.6276:sonar \
             -Dsonar.projectKey=Komfort-chain_modulo1 \
             -Dsonar.organization=komfort-chain \
             -Dsonar.host.url=https://sonarcloud.io \
@@ -91,18 +87,21 @@ jobs:
           java-version: 21
           distribution: temurin
 
+      - name: Grant execute permission to Maven Wrapper
+        run: chmod +x pessoas/mvnw
+
       - name: Run Dependency-Check
         working-directory: pessoas
         run: |
           mkdir -p ../reports/pessoas
           echo "Running OWASP Dependency-Check..."
-          mvn -B org.owasp:dependency-check-maven:10.0.4:check \
+          ./mvnw -B org.owasp:dependency-check-maven:10.0.4:check \
             -Dformat=ALL \
             -DfailOnError=false \
             -DoutputDirectory=../reports/pessoas \
             -Dnvd.api.key=${{ secrets.NVD_API_KEY }} || (
               echo "NVD update failed, retrying offline..."
-              mvn -B org.owasp:dependency-check-maven:10.0.4:check \
+              ./mvnw -B org.owasp:dependency-check-maven:10.0.4:check \
                 -Dformat=ALL \
                 -DfailOnError=false \
                 -DoutputDirectory=../reports/pessoas \
@@ -138,6 +137,9 @@ jobs:
           java-version: 21
           distribution: temurin
 
+      - name: Grant execute permission to Maven Wrapper
+        run: chmod +x pessoas/mvnw
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -149,13 +151,13 @@ jobs:
 
       - name: Package API Pessoas
         working-directory: pessoas
-        run: mvn -B clean package -DskipTests=true
+        run: ./mvnw -B clean package -DskipTests=true
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./pessoas
-          file: ./Dockerfile     
+          file: ./pessoas/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/api-pessoas:latest
