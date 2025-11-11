@@ -1,7 +1,7 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     username: sa
     password:
   jpa:
@@ -13,6 +13,13 @@ spring:
   sql:
     init:
       mode: never
+
 logging:
   level:
     root: WARN
+    org.hibernate: ERROR
+    org.springframework: WARN
+    com.cabos.pessoas: INFO
+
+server:
+  port: 0

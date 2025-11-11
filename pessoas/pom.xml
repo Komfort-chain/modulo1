@@ -22,7 +22,7 @@
         <java.version>21</java.version>
         <sonar.organization>komfort-chain</sonar.organization>
         <sonar.projectKey>Komfort-chain_modulo1</sonar.projectKey>
-        <logback-gelf.version>4.0.4</logback-gelf.version>
+        <logback-gelf.version>4.0.2</logback-gelf.version>
     </properties>
 
     <dependencies>
@@ -49,11 +49,10 @@
 
         <!-- LOGGING PARA GRAYLOG -->
         <dependency>
-          <groupId>de.siegmar</groupId>
-          <artifactId>logback-gelf</artifactId>
-          <version>4.0.2</version>
+            <groupId>de.siegmar</groupId>
+            <artifactId>logback-gelf</artifactId>
+            <version>${logback-gelf.version}</version>
         </dependency>
-
 
         <!-- LOMBOK -->
         <dependency>
@@ -68,6 +67,15 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Suporte a anotações de teste (@AutoConfigureTestDatabase, etc.) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test-autoconfigure</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JUnit -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
