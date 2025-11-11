@@ -46,7 +46,10 @@ jobs:
 
       - name: Build and test (API Pessoas)
         working-directory: pessoas
-        run: mvn -B clean verify -DskipTests=false
+        run: |
+          mvn -B clean verify \
+            -Dspring.profiles.active=test \
+            -DskipTests=false
 
       - name: SonarCloud Analysis
         working-directory: pessoas
