@@ -28,7 +28,7 @@ jobs:
         working-directory: pessoas
         run: |
           chmod +x mvnw
-          ./mvnw clean package -DskipTests=true
+          ./mvnw -B clean package -DskipTests=true
         env:
           MAVEN_OPTS: -Xmx2G
 
