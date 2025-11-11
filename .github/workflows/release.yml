@@ -17,12 +17,23 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # garante acesso ao histórico completo para gerar changelog
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
+
+      - name: Verify Maven Wrapper presence
+        run: |
+          if [ ! -f "pessoas/mvnw" ]; then
+            echo "Maven Wrapper não encontrado em pessoas/mvnw"
+            exit 1
+          else
+            echo "Maven Wrapper encontrado com sucesso."
+          fi
 
       - name: Build artifact with Maven
         working-directory: pessoas
