@@ -25,7 +25,6 @@ jobs:
           fetch-depth: 0
 
       - name: Setup JDK 21
-        id: setup-java
         uses: actions/setup-java@v4
         with:
           java-version: 21
@@ -46,11 +45,11 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build and test (API Pessoas)
-        working-directory: api-pessoas
+        working-directory: pessoas
         run: mvn -B clean verify -DskipTests=false
 
       - name: SonarCloud Analysis
-        working-directory: api-pessoas
+        working-directory: pessoas
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
@@ -69,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-reports
-          path: api-pessoas/target/site/jacoco/
+          path: pessoas/target/site/jacoco/
 
   # --------------------------------------------------------
   # JOB 2 — OWASP Dependency-Check
@@ -90,20 +89,20 @@ jobs:
           distribution: temurin
 
       - name: Run Dependency-Check
-        working-directory: api-pessoas
+        working-directory: pessoas
         run: |
-          mkdir -p ../reports/api-pessoas
+          mkdir -p ../reports/pessoas
           echo "Running OWASP Dependency-Check..."
           mvn -B org.owasp:dependency-check-maven:10.0.4:check \
             -Dformat=ALL \
             -DfailOnError=false \
-            -DoutputDirectory=../reports/api-pessoas \
+            -DoutputDirectory=../reports/pessoas \
             -Dnvd.api.key=${{ secrets.NVD_API_KEY }} || (
               echo "NVD update failed, retrying offline..."
               mvn -B org.owasp:dependency-check-maven:10.0.4:check \
                 -Dformat=ALL \
                 -DfailOnError=false \
-                -DoutputDirectory=../reports/api-pessoas \
+                -DoutputDirectory=../reports/pessoas \
                 -Danalyzer.nvd.api.enabled=false
             )
 
@@ -146,13 +145,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Package API Pessoas
-        working-directory: api-pessoas
+        working-directory: pessoas
         run: mvn -B clean package -DskipTests=true
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./api-pessoas
+          context: ./pessoas
+          file: ./pessoas/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/api-pessoas:latest
