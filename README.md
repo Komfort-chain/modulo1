@@ -1,9 +1,7 @@
 # **Módulo 1 — API de Pessoas (Komfort Chain)**
 
-O **Módulo 1** da suíte **Komfort Chain** implementa a API REST responsável pela **gestão de pessoas**.
-O serviço fornece operações de CRUD completas com **persistência em banco PostgreSQL**, **validação de dados**, logs estruturados via **Graylog**, além de integração total com o pipeline de qualidade (SonarCloud + OWASP Dependency-Check).
-
-A aplicação segue os princípios de **Clean Architecture**, **SOLID** e boas práticas de **engenharia de software corporativa**.
+O **Módulo 1** da suíte **Komfort Chain** implementa uma API REST completa para **gestão de pessoas**, incluindo CRUD, paginação, validação e persistência utilizando **PostgreSQL**.
+O serviço segue rigorosamente os princípios de **Clean Architecture**, **SOLID** e boas práticas corporativas de desenvolvimento, adicionando **observabilidade centralizada (Graylog)** e integração com pipeline de qualidade (**SonarCloud**, **OWASP Dependency-Check** e **Docker Build Automation**).
 
 ---
 
@@ -11,15 +9,15 @@ A aplicação segue os princípios de **Clean Architecture**, **SOLID** e boas p
 
 [![Full CI/CD](https://github.com/Komfort-chain/modulo1/actions/workflows/full-ci.yml/badge.svg)](https://github.com/Komfort-chain/modulo1/actions/workflows/full-ci.yml)
 [![Release](https://github.com/Komfort-chain/modulo1/actions/workflows/release.yml/badge.svg)](https://github.com/Komfort-chain/modulo1/actions/workflows/release.yml)
-[![Docker Hub](https://img.shields.io/badge/DockerHub-magyodev/api--pessoas-blue)](https://hub.docker.com/repository/docker/magyodev/api-pessoas)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Komfort-chain_modulo1\&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Komfort-chain_modulo1)
 [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=Komfort-chain_modulo1\&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Komfort-chain_modulo1)
+[![Docker Hub](https://img.shields.io/badge/DockerHub-magyodev/api--pessoas-blue)](https://hub.docker.com/repository/docker/magyodev/api-pessoas)
 
 ---
 
 ## **Tecnologias Utilizadas**
 
-| Categoria            | Tecnologia / Ferramenta              |
+| Categoria            | Ferramenta / Tecnologia              |
 | -------------------- | ------------------------------------ |
 | **Linguagem**        | Java 21                              |
 | **Framework**        | Spring Boot 3.5.7                    |
@@ -27,9 +25,22 @@ A aplicação segue os princípios de **Clean Architecture**, **SOLID** e boas p
 | **Logs**             | Logback GELF → Graylog 5.2           |
 | **Build**            | Maven Wrapper (`mvnw`)               |
 | **Testes**           | JUnit 5 + Spring Boot Test + JaCoCo  |
-| **Análise Estática** | SonarCloud + OWASP Dependency-Check  |
-| **Containerização**  | Docker + Docker Compose              |
-| **Arquitetura**      | Clean Architecture • SOLID • RESTful |
+| **Análise Estática** | SonarCloud + OWASP Dependency Check  |
+| **Containerização**  | Docker e Docker Compose              |
+| **Arquitetura**      | Clean Architecture / SOLID / RESTful |
+
+---
+
+## **Arquitetura**
+
+A aplicação segue uma arquitetura limpa dividida em camadas independentes:
+
+```
+Controller → Service → Repository → Domain
+```
+
+Para observabilidade, logs estruturados são enviados via GELF ao Graylog.
+O PostgreSQL armazena os dados persistentes da API.
 
 ---
 
@@ -39,9 +50,11 @@ A aplicação segue os princípios de **Clean Architecture**, **SOLID** e boas p
 modulo1/
 ├── docker-compose.yml
 ├── Dockerfile
+├── README.md
+│
 ├── .github/workflows/
-│   ├── full-ci.yml
-│   └── release.yml
+│   ├── full-ci.yml        # CI/CD completo: build, testes, análise e publicação
+│   └── release.yml        # Automação de releases
 │
 └── pessoas/
     ├── pom.xml
@@ -56,15 +69,10 @@ modulo1/
     │       ├── controller/PessoaController.java
     │       ├── handler/GlobalExceptionHandler.java
     │       └── mapper/PessoaMapper.java
+    │
     └── src/main/resources/
         ├── application.yml
         └── logback-spring.xml
-```
-
-### **Fluxo Arquitetural**
-
-```
-Controller → Service → Repository → Domain
 ```
 
 ---
@@ -83,37 +91,42 @@ cd modulo1
 ```bash
 cd pessoas
 ./mvnw clean package -DskipTests
+cd ..
 ```
 
-### **3. Subir os containers**
+### **3. Subir a stack completa**
 
 ```bash
-docker compose build
-docker compose up -d
+docker compose up --build -d
 ```
 
 ### **Serviços esperados**
 
-| Serviço        | Porta | Descrição                         |
-| -------------- | ----- | --------------------------------- |
-| API de Pessoas | 8081  | Endpoints REST                    |
-| PostgreSQL     | 5432  | Armazenamento de pessoas          |
-| Graylog        | 9009  | Logs centralizados                |
-| SonarQube (*)  | 9000  | Análise estática local (opcional) |
+| Serviço        | Porta | Descrição                        |
+| -------------- | ----- | -------------------------------- |
+| API de Pessoas | 8081  | Endpoints REST                   |
+| PostgreSQL     | 5432  | Persistência de dados de pessoas |
+| Graylog        | 9009  | Logs centralizados               |
+| SonarQube (*)  | 9000  | Análise estática (opcional)      |
 
 ---
 
 ## **Endpoints Principais**
 
-| Método | Endpoint        | Descrição        |
-| ------ | --------------- | ---------------- |
-| POST   | `/pessoas`      | Cria nova pessoa |
-| GET    | `/pessoas`      | Lista paginada   |
-| GET    | `/pessoas/{id}` | Busca por ID     |
-| PUT    | `/pessoas/{id}` | Atualiza pessoa  |
-| DELETE | `/pessoas/{id}` | Remove pessoa    |
+| Método | Endpoint        | Descrição                         |
+| ------ | --------------- | --------------------------------- |
+| POST   | `/pessoas`      | Cria uma nova pessoa              |
+| GET    | `/pessoas`      | Lista todas as pessoas (paginado) |
+| GET    | `/pessoas/{id}` | Busca uma pessoa pelo ID          |
+| PUT    | `/pessoas/{id}` | Atualiza uma pessoa               |
+| DELETE | `/pessoas/{id}` | Remove uma pessoa                 |
 
-### **Exemplo de criação (POST)**
+### **Exemplo POST**
+
+```http
+POST http://localhost:8081/pessoas
+Content-Type: application/json
+```
 
 ```json
 {
@@ -123,10 +136,16 @@ docker compose up -d
 }
 ```
 
-### **Exemplo de listagem paginada**
+### **Exemplo GET Paginado**
 
 ```
 GET http://localhost:8081/pessoas?page=0&size=5
+```
+
+### **Exemplo DELETE**
+
+```
+DELETE http://localhost:8081/pessoas/1
 ```
 
 ---
@@ -135,33 +154,35 @@ GET http://localhost:8081/pessoas?page=0&size=5
 
 ### **Workflow Principal — `full-ci.yml`**
 
-Inclui:
+Executado automaticamente:
 
-1. Build + testes
-2. SonarCloud
-3. OWASP Dependency-Check
-4. JaCoCo coverage
-5. Build & push para o Docker Hub
+1. Build e testes com Maven Wrapper
+2. Análise estática com **SonarCloud**
+3. Verificação de vulnerabilidades com **OWASP Dependency-Check**
+4. Geração de relatórios (Surefire, JaCoCo)
+5. Build e publicação da imagem Docker no **Docker Hub**
 
 [![Full CI/CD](https://github.com/Komfort-chain/modulo1/actions/workflows/full-ci.yml/badge.svg)](https://github.com/Komfort-chain/modulo1/actions/workflows/full-ci.yml)
+
+---
 
 ### **Workflow de Release — `release.yml`**
 
 Gera automaticamente:
 
-* Tag semântica
-* Release notes
-* Imagens docker versionadas (`vX.Y.Z`)
-
-[![Release](https://github.com/Komfort-chain/modulo1/actions/workflows/release.yml/badge.svg)](https://github.com/Komfort-chain/modulo1/actions/workflows/release.yml)
+* Releases versionadas no formato `vX.Y.Z`
+* Notas de versão
+* Imagens Docker tagueadas com a versão
 
 ---
 
-## **Imagem Docker**
+## **Imagem Docker Oficial**
 
-| Serviço        | Docker Hub                                                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| API de Pessoas | [https://hub.docker.com/repository/docker/magyodev/api-pessoas](https://hub.docker.com/repository/docker/magyodev/api-pessoas) |
+A imagem é publicada automaticamente pelo pipeline:
+
+| Serviço        | Docker Hub                                                                            |
+| -------------- | ------------------------------------------------------------------------------------- |
+| API de Pessoas | [magyodev/api-pessoas](https://hub.docker.com/repository/docker/magyodev/api-pessoas) |
 
 Tags disponíveis:
 
@@ -173,7 +194,15 @@ Tags disponíveis:
 
 ## **Logs e Monitoramento**
 
-Logs em tempo real:
+A API envia logs estruturados via **GELF** para o **Graylog**, incluindo:
+
+* Timestamp
+* Nível de severidade
+* Classe e método
+* Mensagem
+* Stacktrace (quando aplicável)
+
+Visualizar em tempo real:
 
 ```bash
 docker logs -f api-pessoas
@@ -185,29 +214,30 @@ docker logs -f api-pessoas
 
 ```
 ┌────────────┐       ┌──────────────────────┐       ┌───────────────┐
-│   Cliente  │ ───▶  │  API de Pessoas      │ ───▶  │  PostgreSQL   │
+│   Cliente  │ ───▶  │   API de Pessoas     │ ───▶  │   PostgreSQL  │
 └────────────┘       └──────────────────────┘       └───────────────┘
-                              │
-                              ▼
-                       ┌────────────┐
-                       │  Graylog   │
-                       └────────────┘
+                           │
+                           ▼
+                    ┌────────────┐
+                    │  Graylog   │
+                    └────────────┘
 ```
 
 ---
 
 ## **Contribuição**
 
-1. Fork
-2. Branch: `feature/nova-funcionalidade`
-3. Commits semânticos
-4. Pull Request para `main`
+1. Faça um fork do repositório;
+2. Crie uma branch: `feature/nova-funcionalidade`;
+3. Utilize commits semânticos;
+4. Envie um Pull Request para a branch `main`.
 
 ---
 
 ## **Autor**
 
 **Alan de Lima Silva (MagyoDev)**
-* [GitHub](https://github.com/MagyoDev)
+* [GitHub](https://github.com/MagyoDev) 
 * [Docker Hub](https://hub.docker.com/u/magyodev) 
 * [E-mail](mailto:magyodev@gmail.com)
+
