@@ -22,5 +22,5 @@ public class Pessoa {
     private LocalDate dtNascimento;
 
     @Column(nullable = false)
-    private boolean ativo = true;
+    private boolean ativo = true; // padrão
 }

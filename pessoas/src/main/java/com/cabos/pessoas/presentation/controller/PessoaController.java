@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
 
-/**
- * Camada de apresentação da API de Pessoas.
- */
 @RestController
 @RequestMapping("/pessoas")
 public class PessoaController {
@@ -31,40 +28,45 @@ public class PessoaController {
     @GetMapping
     public ResponseEntity<Page<PessoaDTO>> listar(@RequestParam(defaultValue = "0") int page) {
         Page<Pessoa> pessoas = service.listarAtivos(page);
+
         var dtoPage = new PageImpl<>(
-                pessoas.getContent().stream().map(PessoaMapper::toDto).collect(Collectors.toList()),
+                pessoas.getContent()
+                        .stream()
+                        .map(PessoaMapper::toDto)
+                        .collect(Collectors.toList()),
                 pessoas.getPageable(),
                 pessoas.getTotalElements()
         );
-        log.info("Listagem de pessoas ativas - página {}", page);
+
+        log.info("Listando (page={})", page);
         return ResponseEntity.ok(dtoPage);
     }
 
     @PostMapping
     public ResponseEntity<PessoaDTO> criar(@RequestBody PessoaDTO dto) {
-        Pessoa criada = service.criar(PessoaMapper.toEntity(dto));
-        log.info("Pessoa criada: {}", criada.getNome());
-        return ResponseEntity.ok(PessoaMapper.toDto(criada));
+        Pessoa nova = service.criar(PessoaMapper.toEntity(dto));
+        log.info("Criada {}", nova.getNome());
+        return ResponseEntity.ok(PessoaMapper.toDto(nova));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PessoaDTO> buscar(@PathVariable Long id) {
-        Pessoa encontrada = service.buscar(id);
-        log.info("Pessoa buscada: ID {}", id);
-        return ResponseEntity.ok(PessoaMapper.toDto(encontrada));
+        Pessoa p = service.buscar(id);
+        log.info("Buscando ID {}", id);
+        return ResponseEntity.ok(PessoaMapper.toDto(p));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PessoaDTO> atualizar(@PathVariable Long id, @RequestBody PessoaDTO dto) {
-        Pessoa atualizada = service.atualizar(id, PessoaMapper.toEntity(dto));
-        log.info("Pessoa atualizada: {}", atualizada.getNome());
-        return ResponseEntity.ok(PessoaMapper.toDto(atualizada));
+        Pessoa p = service.atualizar(id, PessoaMapper.toEntity(dto));
+        log.info("Atualizada {}", p.getNome());
+        return ResponseEntity.ok(PessoaMapper.toDto(p));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);
-        log.info("Pessoa deletada: ID {}", id);
+        log.info("Deletada ID {}", id);
         return ResponseEntity.noContent().build();
     }
 }

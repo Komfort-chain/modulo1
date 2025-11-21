@@ -21,33 +21,36 @@ public class PessoaService {
         this.repo = repo;
     }
 
+    // Apenas lista registros ativos
     public Page<Pessoa> listarAtivos(int page) {
-        log.info("Listando pessoas ativas (page = {})", page);
+        log.info("Listando ativos (page={})", page);
         return repo.findByAtivoTrue(PageRequest.of(page, 10));
     }
 
     public Pessoa criar(Pessoa p) {
-        log.info("Criando pessoa: {}", p.getNome());
+        log.info("Criando {}", p.getNome());
         return repo.save(p);
     }
 
     public Pessoa buscar(Long id) {
-        log.info("Buscando pessoa com ID: {}", id);
+        log.info("Buscando ID {}", id);
         return repo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Pessoa não encontrada"));
     }
 
-    public Pessoa atualizar(Long id, Pessoa dto) {
-        log.info("Atualizando pessoa ID: {}", id);
+    public Pessoa atualizar(Long id, Pessoa dados) {
+        log.info("Atualizando ID {}", id);
         Pessoa p = buscar(id);
-        p.setNome(dto.getNome());
-        p.setDtNascimento(dto.getDtNascimento());
-        p.setAtivo(dto.isAtivo());
+
+        p.setNome(dados.getNome());
+        p.setDtNascimento(dados.getDtNascimento());
+        p.setAtivo(dados.isAtivo());
+
         return repo.save(p);
     }
 
     public void deletar(Long id) {
-        log.info("Deletando pessoa ID: {}", id);
+        log.info("Deletando ID {}", id);
         repo.deleteById(id);
     }
 }

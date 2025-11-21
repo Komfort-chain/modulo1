@@ -1,4 +1,4 @@
-name: Create GitHub Release (Módulo 1 - API Pessoas)
+name: Release (API Pessoas)
 
 on:
   push:
@@ -11,31 +11,29 @@ permissions:
 
 jobs:
   release:
-    name: Create GitHub Release
+    name: Criar release
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # garante acesso ao histórico completo para gerar changelog
+          fetch-depth: 0
 
-      - name: Set up Java
+      - name: Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      - name: Verify Maven Wrapper presence
+      - name: Verificar Maven Wrapper
         run: |
           if [ ! -f "pessoas/mvnw" ]; then
-            echo "Maven Wrapper não encontrado em pessoas/mvnw"
+            echo "mvnw não encontrado"
             exit 1
-          else
-            echo "Maven Wrapper encontrado com sucesso."
           fi
 
-      - name: Build artifact with Maven
+      - name: Build jar
         working-directory: pessoas
         run: |
           chmod +x mvnw
@@ -43,7 +41,7 @@ jobs:
         env:
           MAVEN_OPTS: -Xmx2G
 
-      - name: Generate changelog
+      - name: Gerar changelog
         id: changelog
         uses: mikepenz/release-changelog-builder-action@v5
         with:
@@ -53,14 +51,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create GitHub Release
+      - name: Criar release
         uses: softprops/action-gh-release@v2
         with:
           name: "Release ${{ github.ref_name }}"
           tag_name: ${{ github.ref_name }}
           body_path: release_notes.md
-          draft: false
-          prerelease: false
           files: |
             pessoas/target/api-pessoas-*.jar
         env:
