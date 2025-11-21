@@ -96,8 +96,7 @@ modulo1/
 
 ---
 
-## **Explicação Pasta por Pasta — e por que esses nomes existem**
----
+## **Explicação Pasta por Pasta**
 
 ### **1. application/**
 
