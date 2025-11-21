@@ -1,9 +1,9 @@
 # **Módulo 1 — API de Pessoas (Komfort Chain)**
 
-O **Módulo 1** marca o início da suíte **Komfort Chain**, trazendo uma API REST para cadastro, consulta, atualização e remoção de pessoas.
-O módulo foi desenvolvido com foco em **organização por camadas**, **baixa complexidade**, **testabilidade** e **estrutura previsível**, seguindo princípios de **Clean Architecture** e **SOLID**.
+O **Módulo 1** inicia a suíte **Komfort Chain**, oferecendo uma API REST para gerenciamento de pessoas, incluindo criação, listagem paginada, consulta por ID, atualização e remoção.
+A arquitetura foi construída com foco em **separação de responsabilidades**, **baixa complexidade**, **testabilidade** e **previsibilidade**, seguindo princípios de **Clean Architecture** e **SOLID**.
 
-A API oferece paginação, filtragem automática de registros ativos, integração com PostgreSQL, logs estruturados via Graylog e pipelines completos de CI/CD com SonarCloud e OWASP Dependency-Check.
+O módulo integra banco PostgreSQL, logs estruturados com Graylog, verificação de qualidade via SonarCloud, testes automatizados e pipelines completos de CI/CD.
 
 ---
 
@@ -13,8 +13,6 @@ A API oferece paginação, filtragem automática de registros ativos, integraç�
 [![Release](https://github.com/Komfort-chain/modulo1/actions/workflows/release.yml/badge.svg)](https://github.com/Komfort-chain/modulo1/actions/workflows/release.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Komfort-chain_modulo1\&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Komfort-chain_modulo1)
 [![Docker Hub](https://img.shields.io/badge/DockerHub-magyodev%2Fapi--pessoas-blue)](https://hub.docker.com/repository/docker/magyodev/api-pessoas)
-![Java](https://img.shields.io/badge/Java-21-red)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.7-brightgreen)
 
 ---
 
@@ -36,30 +34,39 @@ A API oferece paginação, filtragem automática de registros ativos, integraç�
 
 ## **Arquitetura Geral**
 
-A API segue um fluxo simples, limpo e alinhado ao padrão utilizado em toda a suíte:
+Fluxo central de execução da aplicação:
 
-```
+```text
 Controller → Service → Repository → Domain
 ```
 
-### Como isso se relaciona com Clean Architecture?
+Essa divisão garante:
 
-* **Camada de apresentação (Controller)** não contém lógica de negócio.
-* **Camada de aplicação (Service)** concentra regras e casos de uso.
-* **Camada de infraestrutura (Repository)** é apenas acesso ao banco.
-* **Camada de domínio (Model)** não depende de nada externo.
+* **camadas independentes** e fáceis de testar;
+* **domínio puro**, sem dependências externas;
+* **infraestrutura substituível** sem afetar serviços ou controladores;
+* **lógica de negócio concentrada no serviço**, seguindo Clean Architecture.
 
-### Como isso se relaciona com SOLID?
+### Relação com Clean Architecture
 
-* **SRP**: cada classe tem uma responsabilidade objetiva.
-* **OCP**: serviços podem ser estendidos sem alterar controladores.
-* **DIP**: serviço depende de **interface** (repositório), não da implementação do banco.
+* **presentation** → entrega/entrada HTTP
+* **application** → casos de uso
+* **domain** → entidades puras
+* **infrastructure** → persistência e detalhes externos
+
+### Relação com SOLID
+
+* **SRP**: cada classe executa um papel claro (controller, serviço, mapper, repositório).
+* **OCP**: novas regras podem ser adicionadas sem alterar estruturas existentes.
+* **DIP**: serviço depende da **interface** `PessoaRepository`, nunca da implementação concreta.
 
 ---
 
-## **Estrutura do Projeto**
+## **Organização da Estrutura de Pastas**
 
-```
+A estrutura segue o mesmo padrão adotado em todos os módulos da suíte, garantindo consistência.
+
+```text
 modulo1/
 ├── docker-compose.yml
 ├── Dockerfile
@@ -75,139 +82,140 @@ modulo1/
     │
     ├── src/main/java/com/cabos/pessoas/
     │   ├── application/
-    │   │   ├── dto/PessoaDTO.java
-    │   │   └── service/PessoaService.java
+    │   │   ├── dto/
+    │   │   └── service/
     │   │
     │   ├── domain/
-    │   │   └── Pessoa.java
+    │   │   └── model/
     │   │
     │   ├── infrastructure/
-    │   │   └── persistence/repository/PessoaRepository.java
+    │   │   └── persistence/repository/
     │   │
     │   └── presentation/
-    │       ├── controller/PessoaController.java
-    │       ├── handler/GlobalExceptionHandler.java
-    │       └── mapper/PessoaMapper.java
+    │       ├── controller/
+    │       ├── handler/
+    │       └── mapper/
     │
     └── src/main/resources/
         ├── application.yml
         └── logback-spring.xml
 ```
 
----
-
-## **Explicação Pasta por Pasta**
-
-### **1. application/**
-
-Responsável por orquestrar regras, validações e operações de uso da API.
-
-#### **dto/PessoaDTO.java**
-
-* Representa os dados que entram e saem pela API.
-* Evita expor diretamente a entidade `Pessoa`.
-* Segue o princípio **DTO como fronteira da aplicação**.
-
-#### **service/PessoaService.java**
-
-* Contém regras de negócio e operações principais.
-* Isola detalhes do banco e da API.
-* Reflete o conceito de **use case** dentro do Clean Architecture.
+Agora, a explicação detalhada de cada camada no mesmo estilo do Módulo 2:
 
 ---
 
-### **2. domain/**
+## **2.1. `application/` – Casos de Uso**
 
-A parte mais pura da aplicação.
+Contém regras de aplicação e lógica que coordena o fluxo entre domínio e infraestrutura.
 
-#### **Pessoa.java**
+### **dto/**
 
-* É o modelo de domínio.
-* Não depende de frameworks.
-* Representa o “contrato real” da entidade.
-* Segue o princípio **Entities** do Clean Architecture.
+Contém DTOs como:
 
----
+* `PessoaDTO`
 
-### **3. infrastructure/**
+Esses objetos:
 
-Interações técnicas e externas.
+* evitam expor a entidade `Pessoa` diretamente para a API;
+* padronizam entrada e saída da aplicação;
+* seguem a ideia de **fronteira limpa** entre camadas;
+* aplicam **SRP**, já que cada DTO define apenas os atributos necessários ao transporte.
 
-#### **persistence/repository/PessoaRepository.java**
+### **service/**
 
-* Interface Spring Data que acessa o banco.
-* É uma implementação de “detalhe técnico”, não de negócio.
-* Segue o princípio **DIP — dependência em abstrações**.
+Contém classes como:
 
----
+* `PessoaService`
 
-### **4. presentation/**
+Responsável por:
 
-Interface HTTP da aplicação.
-
-#### **controller/PessoaController.java**
-
-* Define os endpoints.
-* Não contém lógica de negócio.
-* Apenas delega ao serviço.
-* Mantém o padrão REST limpo e previsível.
-
-#### **handler/GlobalExceptionHandler.java**
-
-* Centraliza o tratamento de erros.
-* Retorna respostas padronizadas.
-* Evita duplicação no controller.
-
-#### **mapper/PessoaMapper.java**
-
-* Converte entre `Pessoa` ↔ `PessoaDTO`.
-* Mantém **baixa acoplagem** entre as camadas.
+* executar regras de negócio (filtragem por ativo, paginação, alterações etc.);
+* manipular o domínio sem expor detalhes técnicos;
+* utilizar abstrações (interfaces) em vez de implementações concretas (**DIP**).
 
 ---
 
-### **5. src/main/resources/**
+## **2.2. `domain/` – Regras de Negócio**
 
-Arquivos essenciais para execução.
+Contém o núcleo da aplicação.
 
-#### **application.yml**
+### **model/**
 
-* Configurações da aplicação.
-* Porta, PostgreSQL, profiles etc.
+* `Pessoa`
 
-#### **logback-spring.xml**
+A entidade principal:
 
-* Configuração de logs estruturados.
-* Integração com Graylog via GELF.
+* não tem dependências externas;
+* representa o modelo real de pessoa;
+* pode evoluir sem impactar controllers ou banco.
 
----
-
-### **6. Arquivos de build**
-
-#### **pom.xml**
-
-* Declara dependências e plugins.
-* Configura JaCoCo e Sonar.
-
-#### **mvnw / mvnw.cmd**
-
-* Garante mesma versão do Maven em qualquer máquina.
+Em Clean Architecture, essa é a camada mais estável.
 
 ---
 
-### **7. Infraestrutura da raiz**
+## **2.3. `infrastructure/` – Detalhes Técnicos**
 
-#### **docker-compose.yml**
+A infraestrutura concretiza as interfaces definidas na aplicação e no domínio.
 
-* Sobe API + PostgreSQL + Graylog.
+### **persistence/repository/**
 
-#### **Dockerfile**
+* `PessoaRepository`
 
-* Gera a imagem final usada no CI/CD.
+Um contrato de acesso ao banco.
+Implementado via Spring Data JPA.
 
-#### **workflows/**
+Pontos principais:
 
-* full-ci: testes, análise, dependências, build, push.
-* release: gera changelog + publica release + imagens versionadas.
+* responsabilidades de persistência ficam isoladas;
+* banco pode ser trocado sem afetar camadas superiores;
+* segue o **Princípio da Inversão de Dependência**.
+
+---
+
+## **2.4. `presentation/` – Interface HTTP**
+
+Tudo que envolve comunicação com o usuário externo (HTTP).
+
+### **controller/**
+
+* `PessoaController`
+
+Responsável por expor endpoints REST:
+
+* `POST /pessoas`
+* `GET /pessoas`
+* `GET /pessoas/{id}`
+* `PUT /pessoas/{id}`
+* `DELETE /pessoas/{id}`
+
+Importante:
+
+* controller **não sabe nada sobre o banco**;
+* apenas recebe solicitações, chama o serviço e retorna respostas.
+
+### **handler/**
+
+* `GlobalExceptionHandler`
+
+O papel é o mesmo do módulo 2:
+
+* interceptar exceções e gerar respostas padronizadas;
+* evitar duplicação de try/catch;
+* centralizar mensagens e códigos de erro.
+
+### **mapper/**
+
+* `PessoaMapper`
+
+Converte:
+
+* `Pessoa` ↔ `PessoaDTO`
+
+Serve para:
+
+* manter camadas desacopladas;
+* evitar poluir o domínio com detalhes de apresentação.
 
 ---
 
@@ -227,46 +235,82 @@ cd pessoas
 ./mvnw clean package -DskipTests
 ```
 
-### Subir a stack
+### Executar com Docker
 
 ```bash
-docker compose up -d --build
+docker compose up --build -d
 ```
 
 ---
 
-## **Endpoints Principais**
+## **Serviços Disponíveis**
 
-| Método | Rota          | Ação                                   |
-| ------ | ------------- | -------------------------------------- |
-| POST   | /pessoas      | Criar pessoa                           |
-| GET    | /pessoas      | Listar (paginado e filtrado por ativo) |
-| GET    | /pessoas/{id} | Buscar por ID                          |
-| PUT    | /pessoas/{id} | Atualizar dados                        |
-| DELETE | /pessoas/{id} | Remover                                |
+| Serviço     | Porta | Descrição                      |
+| ----------- | ----- | ------------------------------ |
+| API Pessoas | 8081  | Endpoints REST                 |
+| PostgreSQL  | 5432  | Banco de dados                 |
+| Graylog     | 9009  | Logs estruturados da aplicação |
 
 ---
 
-## **CI/CD — Workflows**
+## **Endpoints**
 
-### full-ci.yml
+| Método | Rota          | Descrição                          |
+| ------ | ------------- | ---------------------------------- |
+| POST   | /pessoas      | Criar pessoa                       |
+| GET    | /pessoas      | Listar pessoas (paginado + ativos) |
+| GET    | /pessoas/{id} | Buscar por ID                      |
+| PUT    | /pessoas/{id} | Atualizar dados                    |
+| DELETE | /pessoas/{id} | Remover pessoa                     |
 
-Executado a cada push/pull request:
+---
 
-* Build + Testes
+## **Testes Automatizados**
+
+A estrutura de testes segue o padrão das camadas internas:
+
+```text
+src/test/java/com/cabos/pessoas/
+    application/service/
+    presentation/controller/
+    presentation/mapper/
+```
+
+Os testes validam:
+
+* regras de negócio;
+* conversões de DTOs;
+* comportamento dos endpoints;
+* responses e status HTTP.
+
+O conjunto garante:
+
+* cobertura para SonarCloud;
+* estabilidade do módulo;
+* fácil detecção de regressões.
+
+---
+
+## **CI/CD**
+
+### **full-ci.yml**
+
+Executado em push/PR:
+
+* build + testes
+* cobertura JaCoCo
 * SonarCloud
 * OWASP Dependency-Check
-* Publicação da imagem no Docker Hub
-* Upload de relatórios (JaCoCo e Surefire)
+* build/push Docker
 
-### release.yml
+### **release.yml**
 
-Executado ao criar uma tag SemVer:
+Executado ao criar tag SemVer:
 
 * build completo
 * changelog automático
-* release no GitHub
-* imagens versionadas (`vX.Y.Z`)
+* upload de artefatos
+* imagens Docker versionadas
 
 ---
 
@@ -284,19 +328,9 @@ Tags:
 
 ---
 
-## **Contribuição**
-
-1. Faça um fork
-2. Crie uma branch
-3. Commit semântico
-4. Abra um PR para `main`
-
----
-
 ## **Autor**
 
 **Alan de Lima Silva (MagyoDev)**
 * GitHub: [https://github.com/MagyoDev](https://github.com/MagyoDev)
 * Docker Hub: [https://hub.docker.com/u/magyodev](https://hub.docker.com/u/magyodev)
-* E-mail: [magyodev@gmail.com](mailto:magyodev@gmail.com)
-
+* Email: [magyodev@gmail.com](mailto:magyodev@gmail.com)
