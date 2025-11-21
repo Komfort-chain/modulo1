@@ -317,5 +317,4 @@ Esse formato facilita consultas, auditoria e rastreamento de problemas.
 * GitHub: [https://github.com/MagyoDev](https://github.com/MagyoDev)
 * Docker Hub: [https://hub.docker.com/u/magyodev](https://hub.docker.com/u/magyodev)
 * E-mail: [magyodev@gmail.com](mailto:magyodev@gmail.com)
-  
 
