@@ -250,6 +250,68 @@ Motivo da separação:
 
 ---
 
+## **Testes Automatizados**
+
+Os testes foram implementados para assegurar confiabilidade, estabilidade e previsibilidade no comportamento da API. Eles fazem parte do fluxo contínuo de integração e são executados automaticamente no workflow `full-ci.yml`, contribuindo diretamente para o cumprimento do Quality Gate do SonarCloud.
+
+A estrutura de testes segue a mesma organização das camadas internas do projeto, facilitando navegação e manutenção:
+
+```
+src/test/java/com/cabos/pessoas/
+    application/service/
+    presentation/controller/
+    presentation/mapper/
+```
+
+### **Objetivos dos testes**
+
+Os testes têm como finalidade:
+
+* validar os principais fluxos de execução;
+* garantir o funcionamento correto dos endpoints REST;
+* verificar regras de negócio implementadas na camada de serviço;
+* assegurar consistência nas conversões feitas pelos mappers;
+* aumentar a cobertura exigida pelo SonarCloud para aprovação do Quality Gate;
+* detectar comportamentos inesperados logo no processo de desenvolvimento.
+
+### **Testes de Controller (`PessoaControllerTest`)**
+
+Realizados com `MockMvc`, validam o comportamento da API HTTP sem necessidade de subir o servidor completo. Foram testados:
+
+* `GET /pessoas`;
+* `POST /pessoas`;
+* `PUT /pessoas/{id}`;
+* `DELETE /pessoas/{id}`.
+
+Esses testes garantem que o controller está roteando corretamente, recebendo dados válidos e retornando status adequados.
+
+### **Testes de Serviço (`PessoaServiceTest`)**
+
+Validam regras de negócio e o fluxo interno da aplicação, utilizando mocks do repositório:
+
+* criação de pessoas;
+* atualização de registros;
+* busca por ID;
+* listagem paginada de registros ativos;
+* remoção.
+
+Isso garante que a lógica do serviço permanece isolada e consistente, independentemente da camada HTTP.
+
+### **Testes de Mapper (`PessoaMapperTest`)**
+
+Verificam a integridade da conversão entre:
+
+* `Pessoa` → `PessoaDTO`;
+* `PessoaDTO` → `Pessoa`.
+
+Apesar de simples, esses testes garantem previsibilidade no transporte de dados entre camadas e evitam erros silenciosos ao trabalhar com objetos distintos.
+
+### **Cobertura e Qualidade**
+
+A combinação das três categorias de testes resultou em aumento significativo da cobertura de código novo, permitindo o atendimento do critério mínimo exigido pelo SonarCloud. Esse conjunto de validações automatizadas assegura que o projeto evolua com segurança, reduzindo riscos de regressões e oferecendo maior confiabilidade ao ciclo de desenvolvimento.
+
+---
+
 ### **Workflow de Release — `release.yml`**
 
 Executado apenas quando uma tag no formato `vX.Y.Z` é criada.
