@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -41,6 +42,22 @@ class PessoaControllerTest {
         when(service.listarAtivos(0)).thenReturn(page);
 
         mvc.perform(get("/pessoas"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deveAtualizarPessoa() throws Exception {
+        Pessoa p = new Pessoa();
+        p.setId(1L);
+        p.setNome("Atualizado");
+        p.setDtNascimento(LocalDate.now());
+        p.setAtivo(true);
+
+        when(service.atualizar(eq(1L), any(Pessoa.class))).thenReturn(p);
+
+        mvc.perform(put("/pessoas/1")
+                .contentType("application/json")
+                .content("{\"nome\":\"Atualizado\",\"dtNascimento\":\"2000-01-01\",\"ativo\":true}"))
                 .andExpect(status().isOk());
     }
 
