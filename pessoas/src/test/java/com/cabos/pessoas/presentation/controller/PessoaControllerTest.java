@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -55,5 +56,13 @@ class PessoaControllerTest {
                 .contentType("application/json")
                 .content("{\"nome\":\"Teste\",\"dtNascimento\":\"2000-01-01\",\"ativo\":true}"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void deveDeletarPessoa() throws Exception {
+        doNothing().when(service).deletar(1L);
+
+        mvc.perform(delete("/pessoas/1"))
+                .andExpect(status().isNoContent());
     }
 }
