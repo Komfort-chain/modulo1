@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://pessoas_db:5432/pessoas
+    username: pessoas
+    password: pessoas
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+

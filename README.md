@@ -1,9 +1,9 @@
 # **Módulo 1 — API de Pessoas (Komfort Chain)**
 
-O **Módulo 1** inicia a suíte **Komfort Chain**, oferecendo uma API REST para gerenciamento de pessoas, incluindo criação, listagem paginada, consulta por ID, atualização e remoção.
-A arquitetura foi construída com foco em **separação de responsabilidades**, **baixa complexidade**, **testabilidade** e **previsibilidade**, seguindo princípios de **Clean Architecture** e **SOLID**.
+O **Módulo 1** da suíte **Komfort Chain** implementa uma API REST para **gestão de pessoas**, incluindo criação, consulta, atualização, listagem paginada e exclusão lógica (campo `ativo = false`).
+O módulo segue boas práticas de arquitetura (separação clara entre camadas), princípios SOLID aplicados ao serviço e uso de padrões adequados para DTOs, mapeamento, domínio e infraestrutura.
 
-O módulo integra banco PostgreSQL, logs estruturados com Graylog, verificação de qualidade via SonarCloud, testes automatizados e pipelines completos de CI/CD.
+O projeto foi desenvolvido em **Java 21**, utilizando **Spring Boot 3.5.7**, e conta com toda a observabilidade e análise estática necessária para evolução segura ao longo dos próximos módulos.
 
 ---
 
@@ -18,319 +18,188 @@ O módulo integra banco PostgreSQL, logs estruturados com Graylog, verificação
 
 ## **Tecnologias Utilizadas**
 
-| Categoria        | Tecnologia                                |
-| ---------------- | ----------------------------------------- |
-| Linguagem        | Java 21                                   |
-| Framework        | Spring Boot 3.5.7                         |
-| Banco de Dados   | PostgreSQL 16                             |
-| Logs             | Logback GELF → Graylog 5.2                |
-| Testes           | JUnit 5 • Spring Boot Test • JaCoCo       |
-| Build            | Maven Wrapper (mvnw)                      |
-| Análise Estática | SonarCloud • OWASP Dependency-Check       |
-| Containerização  | Docker • Docker Compose                   |
-| Arquitetura      | Clean Architecture • SOLID • RESTful APIs |
+| Categoria        | Tecnologias / Ferramentas                       |
+| ---------------- | ----------------------------------------------- |
+| Linguagem        | Java 21                                         |
+| Framework        | Spring Boot 3.5.7                               |
+| Banco de Dados   | PostgreSQL 16                                   |
+| Logs             | Logback GELF → Graylog 5.2                      |
+| Testes           | JUnit 5 • Spring Boot Test • JaCoCo             |
+| Análise Estática | SonarCloud • OWASP Dependency-Check • CycloneDX |
+| Build            | Maven Wrapper (mvnw)                            |
+| Containers       | Docker e Docker Compose                         |
 
 ---
 
-## **Arquitetura Geral**
+# **Arquitetura e Organização Interna**
 
-Fluxo central de execução da aplicação:
+A estrutura do projeto segue uma separação clara em:
 
-```text
-Controller → Service → Repository → Domain
+* **api** → controllers e tratamento de exceções
+* **application** → DTOs, mapper e serviço contendo as regras de negócio
+* **domain** → entidade principal e exceções de domínio
+* **infrastructure/repository** → persistência com Spring Data JPA
+
+Estrutura real do projeto:
+
+```bash
+src/main/java/com/cabos/pessoas/
+├── PessoasApplication.java
+│
+├── api/
+│   ├── PessoaController.java
+│   └── GlobalExceptionHandler.java
+│
+├── application/
+│   ├── dto/
+│   │   ├── PessoaRequestDTO.java
+│   │   └── PessoaResponseDTO.java
+│   ├── mapper/
+│   │   └── PessoaMapper.java
+│   └── service/
+│       └── PessoaService.java
+│
+├── domain/
+│   ├── Pessoa.java
+│   └── exception/
+│       └── PessoaNaoEncontradaException.java
+│
+└── infrastructure/
+    └── repository/
+        └── PessoaRepository.java
 ```
 
-Essa divisão garante:
+## **Resumo das responsabilidades**
 
-* **camadas independentes** e fáceis de testar;
-* **domínio puro**, sem dependências externas;
-* **infraestrutura substituível** sem afetar serviços ou controladores;
-* **lógica de negócio concentrada no serviço**, seguindo Clean Architecture.
+### **API (Camada de Entrada)**
 
-### Relação com Clean Architecture
+* Exposição dos endpoints REST
+* Validação de entrada
+* Mapeamento DTO ↔ domínio
+* Tratamento global de exceções
 
-* **presentation** → entrega/entrada HTTP
-* **application** → casos de uso
-* **domain** → entidades puras
-* **infrastructure** → persistência e detalhes externos
+### **Application (Regras de Negócio)**
 
-### Relação com SOLID
+* Implementação das operações: criar, atualizar, listar ativos, buscar, deletar
+* Encapsulamento da lógica central
+* Conversões e resposta padronizada
 
-* **SRP**: cada classe executa um papel claro (controller, serviço, mapper, repositório).
-* **OCP**: novas regras podem ser adicionadas sem alterar estruturas existentes.
-* **DIP**: serviço depende da **interface** `PessoaRepository`, nunca da implementação concreta.
+### **Domain (Modelo)**
 
----
+* Entidade `Pessoa`
+* Métodos de negócio: `atualizar()` e `desativar()`
+* Exceções específicas
 
-## **Organização da Estrutura de Pastas**
+### **Infrastructure (Persistência)**
 
-A estrutura segue o mesmo padrão adotado em todos os módulos da suíte, garantindo consistência.
-
-```text
-modulo1/
-├── docker-compose.yml
-├── Dockerfile
-├── README.md
-│
-├── .github/workflows/
-│   ├── full-ci.yml
-│   └── release.yml
-│
-└── pessoas/
-    ├── pom.xml
-    ├── mvnw / mvnw.cmd
-    │
-    ├── src/main/java/com/cabos/pessoas/
-    │   ├── application/
-    │   │   ├── dto/
-    │   │   └── service/
-    │   │
-    │   ├── domain/
-    │   │   └── model/
-    │   │
-    │   ├── infrastructure/
-    │   │   └── persistence/repository/
-    │   │
-    │   └── presentation/
-    │       ├── controller/
-    │       ├── handler/
-    │       └── mapper/
-    │
-    └── src/main/resources/
-        ├── application.yml
-        └── logback-spring.xml
-```
-
-Agora, a explicação detalhada de cada camada no mesmo estilo do Módulo 2:
+* Repositório JPA
+* Filtro para retornar apenas registros ativos
 
 ---
 
-## **2.1. `application/` – Casos de Uso**
+# **Execução Local**
 
-Contém regras de aplicação e lógica que coordena o fluxo entre domínio e infraestrutura.
-
-### **dto/**
-
-Contém DTOs como:
-
-* `PessoaDTO`
-
-Esses objetos:
-
-* evitam expor a entidade `Pessoa` diretamente para a API;
-* padronizam entrada e saída da aplicação;
-* seguem a ideia de **fronteira limpa** entre camadas;
-* aplicam **SRP**, já que cada DTO define apenas os atributos necessários ao transporte.
-
-### **service/**
-
-Contém classes como:
-
-* `PessoaService`
-
-Responsável por:
-
-* executar regras de negócio (filtragem por ativo, paginação, alterações etc.);
-* manipular o domínio sem expor detalhes técnicos;
-* utilizar abstrações (interfaces) em vez de implementações concretas (**DIP**).
-
----
-
-## **2.2. `domain/` – Regras de Negócio**
-
-Contém o núcleo da aplicação.
-
-### **model/**
-
-* `Pessoa`
-
-A entidade principal:
-
-* não tem dependências externas;
-* representa o modelo real de pessoa;
-* pode evoluir sem impactar controllers ou banco.
-
-Em Clean Architecture, essa é a camada mais estável.
-
----
-
-## **2.3. `infrastructure/` – Detalhes Técnicos**
-
-A infraestrutura concretiza as interfaces definidas na aplicação e no domínio.
-
-### **persistence/repository/**
-
-* `PessoaRepository`
-
-Um contrato de acesso ao banco.
-Implementado via Spring Data JPA.
-
-Pontos principais:
-
-* responsabilidades de persistência ficam isoladas;
-* banco pode ser trocado sem afetar camadas superiores;
-* segue o **Princípio da Inversão de Dependência**.
-
----
-
-## **2.4. `presentation/` – Interface HTTP**
-
-Tudo que envolve comunicação com o usuário externo (HTTP).
-
-### **controller/**
-
-* `PessoaController`
-
-Responsável por expor endpoints REST:
-
-* `POST /pessoas`
-* `GET /pessoas`
-* `GET /pessoas/{id}`
-* `PUT /pessoas/{id}`
-* `DELETE /pessoas/{id}`
-
-Importante:
-
-* controller **não sabe nada sobre o banco**;
-* apenas recebe solicitações, chama o serviço e retorna respostas.
-
-### **handler/**
-
-* `GlobalExceptionHandler`
-
-O papel é o mesmo do módulo 2:
-
-* interceptar exceções e gerar respostas padronizadas;
-* evitar duplicação de try/catch;
-* centralizar mensagens e códigos de erro.
-
-### **mapper/**
-
-* `PessoaMapper`
-
-Converte:
-
-* `Pessoa` ↔ `PessoaDTO`
-
-Serve para:
-
-* manter camadas desacopladas;
-* evitar poluir o domínio com detalhes de apresentação.
-
----
-
-## **Execução Local**
-
-### Clonar o repositório
+## 1. Clone do projeto
 
 ```bash
 git clone https://github.com/Komfort-chain/modulo1.git
 cd modulo1
 ```
 
-### Build
+## 2. Build
 
 ```bash
-cd pessoas
 ./mvnw clean package -DskipTests
 ```
 
-### Executar com Docker
+## 3. Subir com Docker Compose
 
 ```bash
-docker compose up --build -d
+docker compose up -d --build
 ```
 
 ---
 
-## **Serviços Disponíveis**
+# **Serviços Disponíveis**
 
-| Serviço     | Porta | Descrição                      |
-| ----------- | ----- | ------------------------------ |
-| API Pessoas | 8081  | Endpoints REST                 |
-| PostgreSQL  | 5432  | Banco de dados                 |
-| Graylog     | 9009  | Logs estruturados da aplicação |
-
----
-
-## **Endpoints**
-
-| Método | Rota          | Descrição                          |
-| ------ | ------------- | ---------------------------------- |
-| POST   | /pessoas      | Criar pessoa                       |
-| GET    | /pessoas      | Listar pessoas (paginado + ativos) |
-| GET    | /pessoas/{id} | Buscar por ID                      |
-| PUT    | /pessoas/{id} | Atualizar dados                    |
-| DELETE | /pessoas/{id} | Remover pessoa                     |
+| Serviço     | Porta | Descrição         |
+| ----------- | ----- | ----------------- |
+| API Pessoas | 8081  | Endpoints REST    |
+| PostgreSQL  | 5432  | Banco relacional  |
+| Graylog     | 9009  | Logs estruturados |
 
 ---
 
-## **Testes Automatizados**
+# **Endpoints (API v1)**
 
-A estrutura de testes segue o padrão das camadas internas:
+Base URL:
 
-```text
-src/test/java/com/cabos/pessoas/
-    application/service/
-    presentation/controller/
-    presentation/mapper/
+```
+http://localhost:8081/api/v1/pessoas
 ```
 
-Os testes validam:
-
-* regras de negócio;
-* conversões de DTOs;
-* comportamento dos endpoints;
-* responses e status HTTP.
-
-O conjunto garante:
-
-* cobertura para SonarCloud;
-* estabilidade do módulo;
-* fácil detecção de regressões.
+| Método | Rota  | Função                   |
+| ------ | ----- | ------------------------ |
+| POST   | /     | Criar pessoa             |
+| GET    | /     | Listar paginado (ativos) |
+| GET    | /{id} | Buscar por ID            |
+| PUT    | /{id} | Atualizar                |
+| DELETE | /{id} | Remover (inativar)       |
 
 ---
 
-## **CI/CD**
+# **CI/CD**
+
+A pipeline completa está em `.github/workflows/`.
 
 ### **full-ci.yml**
 
-Executado em push/PR:
+Executado a cada push:
 
-* build + testes
-* cobertura JaCoCo
+* Build Maven
+* Testes + JaCoCo
 * SonarCloud
-* OWASP Dependency-Check
-* build/push Docker
+* OWASP Dependency Check
+* Build e push da imagem Docker
 
 ### **release.yml**
 
-Executado ao criar tag SemVer:
+Executado em tags `vX.Y.Z`:
 
-* build completo
-* changelog automático
-* upload de artefatos
-* imagens Docker versionadas
+* Build final da aplicação
+* Changelog automático
+* Publicação da release
+* Upload do `.jar`
+* Push da imagem versionada
 
 ---
 
-## **Imagem Docker Oficial**
+# **Imagem Docker Oficial**
 
-```
-magyodev/api-pessoas
+```bash
+docker pull magyodev/api-pessoas
 ```
 
 Tags:
 
 * `latest`
-* `${run_number}`
 * `vX.Y.Z`
+* `run-<pipeline>`
 
 ---
 
-## **Autor**
+# **Contribuição**
+
+1. Criar fork
+2. Criar branch `feature/...`
+3. Commits semânticos
+4. Abrir PR
+
+---
+
+# **Autor**
 
 **Alan de Lima Silva (MagyoDev)**
 * GitHub: [https://github.com/MagyoDev](https://github.com/MagyoDev)
 * Docker Hub: [https://hub.docker.com/u/magyodev](https://hub.docker.com/u/magyodev)
-* Email: [magyodev@gmail.com](mailto:magyodev@gmail.com)
+* E-mail: [magyodev@gmail.com](mailto:magyodev@gmail.com)

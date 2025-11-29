@@ -1,0 +1,11 @@
+package com.cabos.pessoas.infrastructure.repository;
+
+import com.cabos.pessoas.domain.Pessoa;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
+
+    Page<Pessoa> findByAtivoTrue(Pageable pageable);
+}
